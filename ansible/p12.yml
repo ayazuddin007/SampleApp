@@ -9,8 +9,8 @@
        ignore_errors: true
     
      - name: Remove Docker Image
-       command: docker rmi -f ayazway/sampleapp:latest
+       command: docker rmi -f ayazway/sampleapp
        ignore_errors: true
 
      - name: Create Docker Container
-       command: docker run --name mycon -p 8080:8080 -itd ayazway/sampleapp:latest
+       command: docker run --name mycon -p 8080:8080 -itd ayazway/sampleapp

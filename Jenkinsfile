@@ -1,7 +1,10 @@
 //def tomcatServerIP = '172.31.45.105'
 def ansibleServerIP = '172.31.1.143'
-def ansiblePlaybook = 'ansible-playbook ansible/p1.yml -i ansible/hosts'
+def dockerServerIP = '172.31.15.21'
+//def ansiblePlaybook = 'ansible-playbook ansible/p1.yml -i ansible/hosts'
 //def ansiblePlaybook = 'ansible-playbook ansible/p2.yml -i ansible/hosts'
+def ansiblePlaybook1 = 'ansible-playbook ansible/p11.yml -i ansible/hosts'
+def ansiblePlaybook2 = 'ansible-playbook ansible/p12.yml -i ansible/hosts'
 
 pipeline {
     agent any
@@ -27,11 +30,29 @@ pipeline {
                 }  
             }
         }*/
-        stage('Deploy to Ansible') {
+        /*stage('Deploy to Ansible') {
             steps {
                 sshagent(['Pipeline-user']) {
-                    sh "scp -o StrictHostKeyChecking=no -r ansible docker target/*.war ec2-user@${ansibleServerIP}:/home/ec2-user"
+                    sh "scp -o StrictHostKeyChecking=no -r * ec2-user@${ansibleServerIP}:/home/ec2-user"   //copy all project files
                     sh "ssh -o StrictHostKeyChecking=no ec2-user@${ansibleServerIP} ${ansiblePlaybook}"
+                    
+                }  
+            }
+        }*/
+        stage('Docker Image,Tag Image,Push DockerHub') {
+            steps {
+                sshagent(['Pipeline-user']) {
+                    sh "scp -o StrictHostKeyChecking=no -r * ec2-user@${ansibleServerIP}:/home/ec2-user"   //copy all project files to Ansible Server
+                    sh "ssh -o StrictHostKeyChecking=no ec2-user@${ansibleServerIP} ${ansiblePlaybook1}"
+                    
+                }  
+            }
+        }
+        stage('Docker Container') {
+            steps {
+                sshagent(['Pipeline-user']) {
+                    sh "scp -o StrictHostKeyChecking=no -r * ec2-user@${dockerServerIP}:/home/ec2-user"   //copy all project files to Docker Server
+                    sh "ssh -o StrictHostKeyChecking=no ec2-user@${dockerServerIP} ${ansiblePlaybook2}"
                     
                 }  
             }

@@ -5,6 +5,7 @@ def ansiblePlaybook = 'ansible-playbook ansible/p2.yml -i ansible/hosts'
 
 pipeline {
     agent any
+    options { skipDefaultCheckout() }
     environment {
         PATH = "/opt/maven/bin/:$PATH"
     }

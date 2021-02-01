@@ -42,7 +42,7 @@ pipeline {
         stage('Docker Image,Tag Image,Push DockerHub') {
             steps {
                 sshagent(['Pipeline-user']) {
-                    sh "scp -o StrictHostKeyChecking=no -r * ec2-user@${ansibleServerIP}:/home/ec2-user"   //copy all project files to Ansible Server
+                    sh "scp -o StrictHostKeyChecking=no -r ansible docker target/*.war ec2-user@${ansibleServerIP}:/home/ec2-user"   //copy all project files to Ansible Server
                     sh "ssh -o StrictHostKeyChecking=no ec2-user@${ansibleServerIP} ${ansiblePlaybook1}"   //Run p11.yml on Ansible Server
                     
                 }  

@@ -10,11 +10,11 @@ pipeline {
         PATH = "/opt/maven/bin/:$PATH"
     }
     stages {
-        /*stage('Clone') {
+        stage('Clone') {
             steps {
                 git 'https://github.com/ayazuddin007/sampleapp'   
             }
-        }*/
+        }
         stage('Build') {
             steps {
                 sh "mvn clean install"  

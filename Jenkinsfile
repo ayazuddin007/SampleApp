@@ -41,13 +41,13 @@ pipeline {
         }*/
         stage('Docker Image,Tag Image,Push DockerHub') {
             steps {
-                //def dockerHubCmd = 'docker login -u ayazway -p'
-                
-                sshagent(['Pipeline-user']) {
-                    sh "scp -o StrictHostKeyChecking=no -r * ec2-user@${ansibleServerIP}:/home/ec2-user"   //copy all project files to Ansible Server
+                def dockerHubCmd = 'docker login -u ayazway -p'
+                sshagent(['Pipeline-user']) { 
                     withCredentials([string(credentialsId: 'DockerHub-Credentials', variable: 'DockerHubPwd')]) {
-                        sh "ssh -o StrictHostKeyChecking=no ec2-user@${ansibleServerIP}  sudo docker login -u ayazway -p  ${DockerHubPwd}"
+                       // sh "ssh -o StrictHostKeyChecking=no ec2-user@${ansibleServerIP}  sudo docker login -u ayazway -p  ${DockerHubPwd}"
+                        sh "ssh -o StrictHostKeyChecking=no ec2-user@${ansibleServerIP}  ${dockerHubCmd} ${DockerHubPwd}"
                     }
+                    sh "scp -o StrictHostKeyChecking=no -r * ec2-user@${ansibleServerIP}:/home/ec2-user"   //copy all project files to Ansible Server
                     sh "ssh -o StrictHostKeyChecking=no ec2-user@${ansibleServerIP} ${ansiblePlaybook1}"   //Run p11.yml on Ansible Server        
                 }  
             }

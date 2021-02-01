@@ -1,0 +1,16 @@
+---
+ - hosts: dockerHost
+   user: ec2-user
+   become: yes
+   connection: ssh
+   tasks:
+     - name: Remove Docker Container
+       command: docker rm -f mycon
+       ignore_errors: true
+    
+     - name: Remove Docker Image
+       command: docker rmi -f ayazway/sampleapp
+       ignore_errors: true
+
+     - name: Create Docker Container
+       command: docker run --name mycon -p 8080:8080 -itd ayazway/sampleapp

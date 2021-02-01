@@ -44,7 +44,8 @@ pipeline {
                 sshagent(['Pipeline-user']) {
                     sh "scp -o StrictHostKeyChecking=no -r * ec2-user@${ansibleServerIP}:/home/ec2-user"   //copy all project files to Ansible Server
                     withCredentials([string(credentialsId: 'DockerHub-Credentials', variable: 'DockerHub-Variable')]) {
-                        sh "docker login -u ayazway -p ${DockerHub-Variable}"
+                        def dockerHubCmd = 'docker login -u ayazway -p'
+                        sh "ssh -o StrictHostKeyChecking=no ec2-user@${ansibleServerIP} ${dockerHubCmd} ${DockerHub-Variable}"
                     }
                     sh "ssh -o StrictHostKeyChecking=no ec2-user@${ansibleServerIP} ${ansiblePlaybook1}"   //Run p11.yml on Ansible Server        
                 }  

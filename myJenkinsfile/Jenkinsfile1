@@ -1,3 +1,4 @@
+# Parallel builds with Jenkins Declarative Pipeline
 pipeline {
     agent any
     stages {

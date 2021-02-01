@@ -43,7 +43,7 @@ pipeline {
             steps {
                 sshagent(['Pipeline-user']) {
                     sh "scp -o StrictHostKeyChecking=no -r ansible docker target/*.war ec2-user@${ansibleServerIP}:/home/ec2-user"   //copy all project files to Ansible Server
-                    sh "ssh -o StrictHostKeyChecking=no ec2-user@${ansibleServerIP} ${ansiblePlaybook1}"   //Run p11.yml on Ansible Server
+                   // sh "ssh -o StrictHostKeyChecking=no ec2-user@${ansibleServerIP} ${ansiblePlaybook1}"   //Run p11.yml on Ansible Server
                     
                 }  
             }
@@ -52,8 +52,8 @@ pipeline {
             steps {
                 sshagent(['Pipeline-user']) {
                     //sh "scp -o StrictHostKeyChecking=no -r * ec2-user@${dockerServerIP}:/home/ec2-user"   //copy all project files to Docker Server
-                    sh "ssh -o StrictHostKeyChecking=no ec2-user@${ansibleServerIP} ${ansiblePlaybook2}" //Run p11.yml on Docker Server from Ansible Server
-                    
+                    sh "ssh -o StrictHostKeyChecking=no ec2-user@${ansibleServerIP} ${ansiblePlaybook2}" //Run p12.yml on Docker Server from Ansible Server
+                    2
                 }  
             }
         }

@@ -1,0 +1,8 @@
+---
+ - hosts: local
+   user: ec2-user
+   become: yes
+   connection: ssh
+   tasks:
+     - name: Install tree package
+       command: yum install tree -y

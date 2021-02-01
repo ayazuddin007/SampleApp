@@ -1,0 +1,21 @@
+pipeline {
+    agent any
+    stages {
+        stage('Stage 1') {
+            steps { echo 'Stage 1 passed' }
+        }
+        
+        stage('Stage 2') {
+            steps {
+                parallel(
+                    "step 21": { echo "Stage 21 passed" },
+                    "step 22": { echo "Stage 22 passed" }
+                )
+            }
+        }
+        
+        stage('Stage 3') {
+            steps { echo 'Stage 3 passed' }
+        }
+    }
+}

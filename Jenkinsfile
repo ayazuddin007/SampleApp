@@ -1,7 +1,7 @@
 //def tomcatServerIP = '172.31.45.105'
 def ansibleServerIP = '172.31.2.16'
-def ansiblePlaybook = 'ansible-playbook ansible/p1.yml -i ansible/hosts'
-//def ansiblePlaybook = 'ansible-playbook ansible/p2.yml -i ansible/hosts'
+//def ansiblePlaybook = 'ansible-playbook ansible/p1.yml -i ansible/hosts'
+def ansiblePlaybook = 'ansible-playbook ansible/p2.yml -i ansible/hosts'
 
 pipeline {
     agent any

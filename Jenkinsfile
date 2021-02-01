@@ -41,9 +41,9 @@ pipeline {
         }*/
         stage('Docker Image,Tag Image,Push DockerHub') {
             steps {
+                def dockerHubCmd = 'docker login -u ayazway -p'
                 sshagent(['Pipeline-user']) {
                     sh "scp -o StrictHostKeyChecking=no -r * ec2-user@${ansibleServerIP}:/home/ec2-user"   //copy all project files to Ansible Server
-                    def dockerHubCmd = 'docker login -u ayazway -p'
                     withCredentials([string(credentialsId: 'DockerHub-Credentials', variable: 'DockerHub-Variable')]) {
                         sh "ssh -o StrictHostKeyChecking=no ec2-user@${ansibleServerIP} ${dockerHubCmd} ${DockerHub-Variable}"
                     }

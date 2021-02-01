@@ -29,7 +29,7 @@ pipeline {
         stage('Deploy to Ansible') {
             steps {
                 sshagent(['Pipeline-user']) {
-                    sh "scp -o StrictHostKeyChecking=no ansible target/*.war ec2-user@${ansibleServerIP}:/home/ec2-user"
+                    sh "scp -o StrictHostKeyChecking=no -r ansible target/*.war ec2-user@${ansibleServerIP}:/home/ec2-user"
                     sh "ssh -o StrictHostKeyChecking=no ec2-user@${ansibleServerIP} ${ansiblePlaybook}"
                     
                 }  

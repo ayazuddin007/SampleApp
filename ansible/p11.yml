@@ -5,14 +5,14 @@
    connection: ssh
    tasks:
      - name: Remove Docker Image
-       command: docker rmi -f tomcat ayazway/sampleapp
+       command: docker rmi -f tomcat ayazway/sampleapp:latest
        ignore_errors: true
 
      - name: Create Docker Image
-       command: docker build -f /home/ec2-user/docker/Dockerfile -t ayazway/sampleapp .
+       command: docker build -f /home/ec2-user/docker/Dockerfile -t ayazway/sampleapp:latest .
     
      - name: docker hub credentials
        command: docker login -u "ayazway" -p "Ayaz85044" docker.io
 
      - name: Push Docker Image to DockerHub
-       command: docker push ayazway/sampleapp
+       command: docker push ayazway/sampleapp:latest

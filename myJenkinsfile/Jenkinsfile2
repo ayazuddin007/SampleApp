@@ -1,0 +1,14 @@
+#Parameterized builds
+pipeline {
+    agent any
+    stages {
+        stage('Parameters') {
+            steps {
+                script {
+                    properties([parameters([choice(choices: ['TESTING', 'STAGING', 'PRODUCTION'], description: 'echo "Will deploy to ${params.DEPLOY_ENV}"', name: 'DEPLOY_ENV')])])
+                }
+            }
+        }
+    }
+}
+

@@ -6,5 +6,3 @@ Testing for webhook.
 
 ok
 
-This is test.
-xckxvkmv

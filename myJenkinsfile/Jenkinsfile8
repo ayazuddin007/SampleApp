@@ -1,4 +1,4 @@
-# Pipeline for windows slave
+// Pipeline for Windows Slave
 
 def ansibleServerIP = '15.207.223.63'   // Ansible Server Public IP
 def dockerServerIP = '13.232.154.57'  // Docker Server Public IP

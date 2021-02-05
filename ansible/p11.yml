@@ -12,7 +12,7 @@
        command: docker build -f /home/ec2-user/docker/Dockerfile -t ayazway/sampleapp .
     
      #- name: Dockerhub credentials
-     #  command: docker login -u "ayazway" -p "Ayaz85044" docker.io
+     #  command: docker login -u "ayazway" -p "<dockerHubPwd>" docker.io
       
      - name: Push Docker Image to DockerHub
        command: docker push ayazway/sampleapp

@@ -1,0 +1,55 @@
+# Pipeline for windows slave
+
+def ansibleServerIP = '15.207.223.63'   // Ansible Server Public IP
+def dockerServerIP = '13.232.154.57'  // Docker Server Public IP
+def ansiblePlaybook1 = 'ansible-playbook ansible/p11.yml -i ansible/hosts'
+def ansiblePlaybook2 = 'ansible-playbook ansible/p12.yml -i ansible/hosts'
+
+pipeline {
+    agent { label 'Windows'}
+    stages {
+        stage('Clone') {
+            steps { 
+                git 'https://github.com/ayazuddin007/sampleapp.git' 
+            }
+        }
+        stage('Build') {
+            steps { 
+                bat "mvn clean install" 
+               // bat "echo ${env.WORKSPACE}"
+            }
+        }
+        /*stage('Deploy to Ansible') {
+            steps {
+                sshagent(['Pipeline-user']) {
+                    // Install pscp in Windows 10 , set Env Varibale in Windows 10
+                    bat "scp -r * ec2-user@${ansibleServerIP}:/home/ec2-user"   //copy all project files
+                    // Install Openssh-64 in Windows 10 , set Env Varibale in Windows 10
+                    bat "ssh ec2-user@${ansibleServerIP} ${ansiblePlaybook1}"
+                    //bat "echo ${env.WORKSPACE}"
+                }  
+            }
+        }*/
+        
+        stage('Docker Image,Tag Image,Push DockerHub') {  //On Ansible Server
+            steps {
+                sshagent(['Pipeline-user']) { 
+                    withCredentials([string(credentialsId: 'DockerHub-Credentials', variable: 'DockerHubPwd')]) {
+                       bat "ssh -o StrictHostKeyChecking=no ec2-user@${ansibleServerIP} docker login -u ayazway -p  ${DockerHubPwd}"
+                    }
+                    // Install pscp in Windows 10 , set Env Varibale in Windows 10
+                    bat "scp -r * ec2-user@${ansibleServerIP}:/home/ec2-user"   //copy all project files to Ansible Server
+                    // Install Openssh-64 in Windows 10 , set Env Varibale in Windows 10
+                    bat "ssh -o StrictHostKeyChecking=no ec2-user@${ansibleServerIP} ${ansiblePlaybook1}"   //Run p11.yml on Ansible Server        
+                }  
+            }
+        }
+        stage('Docker Container') {  //On Docker Server
+            steps {
+                sshagent(['Pipeline-user']) {
+                    bat "ssh -o StrictHostKeyChecking=no ec2-user@${ansibleServerIP} ${ansiblePlaybook2}" //Run p12.yml on Docker Server from Ansible Server
+                }  
+            }
+        }
+    }
+}

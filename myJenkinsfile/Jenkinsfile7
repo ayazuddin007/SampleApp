@@ -1,0 +1,16 @@
+# Pipeline for windows Agent
+pipeline {
+    agent { label 'Windows'}
+    stages {
+        stage('Clone') {
+            steps { 
+                git 'https://github.com/ayazuddin007/sampleapp.git' 
+            }
+        }
+        stage('Build') {
+            steps { 
+                bat "mvn clean install" 
+            }
+        }
+    }
+}

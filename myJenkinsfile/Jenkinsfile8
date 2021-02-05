@@ -7,6 +7,7 @@ def ansiblePlaybook2 = 'ansible-playbook ansible/p12.yml -i ansible/hosts'
 
 pipeline {
     agent { label 'Windows'}
+    options { skipDefaultCheckout() }
     stages {
         stage('Clone') {
             steps { 

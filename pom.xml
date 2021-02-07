@@ -7,16 +7,8 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>sampleapp Maven Webapp</name>
   <url>http://maven.apache.org</url>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
   
-  <distributionManagement>
+   <distributionManagement>
     <repository>
       <id>deployment</id>
       <name>Internal Release</name>
@@ -29,26 +21,24 @@
     </snapshotRepository>
   </distributionManagement>
   
+  
+  
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  
+ 
+  
   <build>
     <finalName>sampleapp</finalName>
-    <plugins>
-        <plugin>
-            <artifactId>maven-deploy-plugin</artifactId>
-            <version>3.0.0-M1</version>
-        </plugin>
-    </plugins>
   </build>
   
-  <dependencyManagement>
-    <dependencies>
-        <dependency>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-deploy-plugin</artifactId>
-          <version>3.0.0-M1</version>
-          <type>maven-plugin</type>
-        </dependency>
-    </dependencies>
-  </dependencyManagement>
+  
   
   
   

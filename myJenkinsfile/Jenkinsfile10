@@ -1,0 +1,25 @@
+// Pipelin till Nexus
+pipeline {
+    agent any
+    options { skipDefaultCheckout() }
+    environment {
+        PATH = "/opt/maven/bin/:$PATH"
+    }
+    stages {
+        stage('Clone') {
+            steps {
+                git 'https://github.com/ayazuddin007/sampleapp.git'   
+            }
+        }
+        stage('Build') {
+            steps {
+                sh "mvn clean install"  
+            }
+        }
+        stage('Upload Artifact to Nexus') {
+            steps {
+                nexusArtifactUploader artifacts: [[artifactId: 'sampleapp$BUILD_TIMESTAMP', classifier: '', file: 'target/sampleapp.war', type: 'war']], credentialsId: 'Nexus-user', groupId: 'com.sampleapp', nexusUrl: '172.31.15.206:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'sampleapp-release', version: '0.0.1-SNAPSHOT$BUILD_ID'
+            }    
+        }
+    }
+}

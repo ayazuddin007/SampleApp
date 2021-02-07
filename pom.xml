@@ -8,6 +8,19 @@
   <name>sampleapp Maven Webapp</name>
   <url>http://maven.apache.org</url>
   
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <finalName>sampleapp</finalName>
+  </build>
+  
    <distributionManagement>
     <repository>
       <id>deployment</id>
@@ -20,26 +33,5 @@
       <url>http://15.207.19.213:8081/repository/test-snapshot/</url>
     </snapshotRepository>
   </distributionManagement>
-  
-  
-  
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-  
- 
-  
-  <build>
-    <finalName>sampleapp</finalName>
-  </build>
-  
-  
-  
-  
   
 </project>

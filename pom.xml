@@ -18,4 +18,18 @@
   <build>
     <finalName>sampleapp</finalName>
   </build>
+  
+  <distributionManagement>
+    <repository>
+      <id>deployment</id>
+      <name>Internal Release</name>
+      <url>http://15.207.19.213:8081/repository/test-release/</url>
+    </repository>
+    <snapshotRepository>
+      <id>deployment</id>
+      <name>Internal Snapshot Release</name>
+      <url>http://15.207.19.213:8081/repository/test-snapshot/</url>
+    </snapshotRepository>
+  </distributionManagement>
+  
 </project>

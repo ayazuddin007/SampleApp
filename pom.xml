@@ -15,9 +15,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-    <finalName>sampleapp</finalName>
-  </build>
   
   <distributionManagement>
     <repository>
@@ -31,5 +28,17 @@
       <url>http://15.207.19.213:8081/repository/test-snapshot/</url>
     </snapshotRepository>
   </distributionManagement>
+  
+  <build>
+    <finalName>sampleapp</finalName>
+    <plugins>
+        <plugin>
+            <artifactId>maven-deploy-plugin</artifactId>
+            <version>3.0.0-M1</version>
+        </plugin>
+    </plugins>
+  </build>
+  
+  
   
 </project>

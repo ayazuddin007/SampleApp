@@ -1,4 +1,4 @@
-// Pipelin till Nexus
+// Pipeline , Deploy Artifact to Nexus
 pipeline {
     agent any
     options { skipDefaultCheckout() }

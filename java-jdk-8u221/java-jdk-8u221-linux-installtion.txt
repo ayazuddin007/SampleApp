@@ -1,0 +1,40 @@
+To download java 1.8.0_221 on linux
+============================
+Imp Link: https://www.thegeekstuff.com/2017/06/java-8-jre-jdk-install/
+
+go to https://www.oracle.com/java/technologies/javase/javase8u211-later-archive-downloads.html
+ctrl + f  => jdk-8u221-linux-x64.rpm 
+click on linlk
+Ask for oracle credentials
+	username = s.ayazuddin007@gmail.com
+	password = Ayaz8504
+Become Ec2-user
+
+Download jdk-8u221-linux-x64.rpm on windows
+Go to Download Folder or E:\devops\jenkins\files 
+Drag that jdk into Mobaxterm ec2-user section
+
+As a ec2-user:  ls
+Become root user:  # cp /home/ec2-user/jdk-8u221-linux-x64.rpm .
+	           # ls
+	           # rpm -ivh jdk-8u221-linux-x64.rpm
+	           # java -version
+verify the version of both linux and windows.
+
+Set JAVA_HOME Environment Variable
+==============================
+# ls -l /usr/java/
+output:
+ 	lrwxrwxrwx. 1 root root  16 Jan 28 06:26 default -> /usr/java/latest
+	drwxr-xr-x. 8 root root 258 Jan 28 06:26 jdk1.8.0_221-amd64
+	lrwxrwxrwx. 1 root root  28 Jan 28 06:26 latest -> /usr/java/jdk1.8.0_221-amd64
+
+vi .bash_profile
+-----------------
+	JAVA_HOME=/usr/java/jdk1.8.0_221-amd64
+	PATH=$PATH:$HOME/bin:$JAVA_HOME
+save it.
+
+source ~/.bash_profile
+echo $PATH
+echo $JAVA_HOME

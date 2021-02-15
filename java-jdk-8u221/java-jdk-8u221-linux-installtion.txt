@@ -7,7 +7,7 @@ ctrl + f  => jdk-8u221-linux-x64.rpm
 click on linlk
 Ask for oracle credentials
 	username = s.ayazuddin007@gmail.com
-	password = Ayaz8504
+	password = <Gmail Pass>
 Become Ec2-user
 
 Download jdk-8u221-linux-x64.rpm on windows

@@ -1,0 +1,36 @@
+#pipeline for sonarqube analysis
+
+pipeline {
+    agent any
+    options { skipDefaultCheckout() }
+    environment {
+        PATH = "/opt/maven/bin/:$PATH"
+    }
+    stages {
+        stage('Clone') {
+            steps {
+                git 'https://github.com/ayazuddin007/sampleapp.git'   
+            }
+        }
+        stage('Build') {
+            steps {
+                sh "mvn clean install"  
+            }
+        }
+        stage("SonarQube analysis") {
+            steps {
+              withSonarQubeEnv('SonarQube-Server') {
+                 sh 'mvn sonar:sonar'
+                }    
+            }
+        }
+        stage("SonarQube Quality Gate") {
+            steps {
+              timeout(time: 1, unit: 'HOURS') {
+                waitForQualityGate abortPipeline: true
+              }
+            }
+        }
+        
+    }
+}

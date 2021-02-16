@@ -1,0 +1,9 @@
+sonar.projectKey=$JOB_NAME
+sonar.projectName=$JOB_NAME
+sonar.projectVersion=1.0
+sonar.sources=/var/lib/jenkins/workspace/$JOB_NAME/src/
+sonar.language=java
+sonar.sourceEncoding=UTF-8
+sonar.java.binaries=/var/lib/jenkins/workspace/$JOB_NAME/target/classes
+sonar.junit.reportsPath=/var/lib/jenkins/workspace/$JOB_NAME/target/surefire-reports
+sonar.jacoco.reportPath=/var/lib/jenkins/workspace/$JOB_NAME/target/jacoco.exec

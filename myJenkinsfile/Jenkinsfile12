@@ -1,3 +1,4 @@
+//Uplaod Artifact to JFrog
 pipeline {
     agent any
     options { skipDefaultCheckout() }

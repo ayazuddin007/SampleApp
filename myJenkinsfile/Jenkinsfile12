@@ -1,0 +1,56 @@
+//Upload Artifact to JFrog Artifactory
+pipeline {
+    agent any
+    options { skipDefaultCheckout() }
+    environment {
+       PATH = "/usr/share/maven/bin/:$PATH"
+    }
+    
+    stages {
+        stage('Git Checkout') { 
+            steps {
+               git branch: 'main', credentialsId: 'Ayaz-xoriant-git', url: 'https://github.com/AyazuddinEjazuddin/wex-spring-petclinic.git'
+            }
+        }
+        
+        stage('Maven Build') { 
+            steps {
+                sh "mvn clean install"
+            }
+        }
+        
+        stage ('Upload Artifact to Jfrog') {
+            steps {
+                
+                rtServer (
+                    id: "Jfrog-Artifactory-Server",
+                    url: "http://54.83.85.147:8082/artifactory",
+                    credentialsId: "Jfrog-Deployer"
+                )
+                
+                rtUpload (
+                    serverId: "Jfrog-Artifactory-Server",
+                    spec: """{
+                        "files": [
+                                {
+                                    "pattern": "**/spring-petclinic-2.4.2.jar",
+                                    "target": "maven-local-test-pipeline"
+                                }
+                            ]
+                        }"""
+                )
+                
+                rtBuildInfo (
+                    captureEnv: true,
+                    buildName: "${env.JOB_NAME}",
+                    buildNumber: "${env.BUILD_NUMBER}"
+                )
+                
+                rtPublishBuildInfo (
+                        serverId: "Jfrog-Artifactory-Server"
+                 )
+            }
+        }
+        
+    }
+}

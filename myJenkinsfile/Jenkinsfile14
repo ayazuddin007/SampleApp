@@ -1,0 +1,80 @@
+//Jenkins pipeline to upload docker image to JFrog Artifactory
+def Jfrog_Artifact_URL = 'http://54.83.85.147:8082/artifactory/maven-local-test/org/springframework/samples/spring-petclinic/2.4.2/spring-petclinic-2.4.2.jar'
+def Docker_Image = '54.83.85.147:8082/maven-local-test-pipeline-docker/spring-petclinic:1.0'
+
+pipeline {
+    agent any
+    options { skipDefaultCheckout() }
+    environment {
+       PATH = "/usr/share/maven/bin/:$PATH"
+       JFROG_ARTIFACT_CREDS = credentials('Jfrog-Deployer')
+       JFROG_IMAGE_CREDS = credentials('Jfrog-Image-Deployer')
+    }
+    
+    stages {
+        stage('Git Checkout') { 
+            steps {
+               git branch: 'main', credentialsId: 'Ayaz-xoriant-git', url: 'https://github.com/AyazuddinEjazuddin/wex-spring-petclinic.git'
+            }
+        }
+        
+        stage('Maven Build') { 
+            steps {
+                sh "mvn clean install"
+            }
+        }
+        
+        stage ('Upload Artifact to Jfrog') {
+            steps {
+                
+                rtServer (
+                    id: "Jfrog-Artifactory-Server",
+                    url: "http://54.83.85.147:8082/artifactory",
+                    credentialsId: "Jfrog-Deployer"
+                )
+                
+                rtUpload (
+                    serverId: "Jfrog-Artifactory-Server",
+                    spec: """{
+                        "files": [
+                                {
+                                    "pattern": "**/spring-petclinic-2.4.2.jar",
+                                    "target": "maven-local-test-pipeline"
+                                }
+                            ]
+                        }"""
+                )
+                
+                rtBuildInfo (
+                    captureEnv: true,
+                    buildName: "${env.JOB_NAME}",
+                    buildNumber: "${env.BUILD_NUMBER}"
+                )
+                
+                rtPublishBuildInfo (
+                        serverId: "Jfrog-Artifactory-Server"
+                 )
+            }
+        }
+        
+        stage('Download Artifact from Jfrog') { 
+            steps {
+                sh("curl -sSf -u $JFROG_ARTIFACT_CREDS_USR:$JFROG_ARTIFACT_CREDS_PSW -O ${Jfrog_Artifact_URL}")
+            }
+        }
+        
+        stage ('Build Docker Image') {
+            steps {
+                sh "docker build -t ${Docker_Image}.${env.BUILD_NUMBER} ."
+            }
+        }
+        
+        stage ('Push Docker Image to Jfrog') {
+            steps {
+                sh "docker login -u $JFROG_IMAGE_CREDS_USR -p $JFROG_IMAGE_CREDS_PSW 54.83.85.147:8082"
+                sh "docker push ${Docker_Image}.${env.BUILD_NUMBER}"
+                sh "docker rmi -f ${Docker_Image}.${env.BUILD_NUMBER}"
+            }
+        }
+    }
+}

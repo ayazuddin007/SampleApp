@@ -6,7 +6,7 @@
 // systemctl restart docker 
 // systemctl restart jenkins
 // install  docker pipeline plugin and ssh-agent plugin
-// create aws-spring-boot-ecr aws credentials with accesskey and private key into jenkisn pipeline credentials
+// create aws-spring-boot-ecr aws credentials with aws accesskey and secret key into jenkins pipeline credentials
 // create Ayaz-xoriant-git jenkins credentials with username and password 
 
 

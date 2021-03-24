@@ -1,4 +1,14 @@
 //uploading docker image aws ECR
+// add jenkins into docker group
+// usermod -aG docker jenkins
+// id jenkins
+//restart docker and jenkins
+// systemctl restart docker 
+// systemctl restart jenkins
+// install  docker pipeline plugin and ssh-agent plugin
+// create aws-spring-boot-ecr aws credentials with accesskey and private key into jenkisn pipeline credentials
+// create Ayaz-xoriant-git jenkins credentials with username and password 
+
 
 def GitHub_Url = 'https://github.com/AyazuddinEjazuddin/wex-spring-petclinic.git'
 def ECR_Docker_Repo = '894585519143.dkr.ecr.us-east-1.amazonaws.com'

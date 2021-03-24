@@ -2,7 +2,7 @@
 
 def GitHub_Url = 'https://github.com/AyazuddinEjazuddin/wex-spring-petclinic.git'
 def ECR_Docker_Repo = '894585519143.dkr.ecr.us-east-1.amazonaws.com'
-def Docker_Image = 'wex-demo-app:petclinic'
+def Docker_Image = "wex-demo-app:petclinic${env.BUILD_NUMBER}"
 def ECRURL = 'https://894585519143.dkr.ecr.us-east-1.amazonaws.com'
 def ECRCRED = 'ecr:us-east-1:aws-spring-boot-ecr'
 

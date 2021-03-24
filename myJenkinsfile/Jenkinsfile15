@@ -83,6 +83,9 @@ pipeline {
                 rtPublishBuildInfo (
                         serverId: "Jfrog-Artifactory-Server"
                  )
+                 
+                 // to delete docker image
+                 sh "docker rmi -f ${Docker_Image}.${env.BUILD_NUMBER}"
             }
         }
     }

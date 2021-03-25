@@ -5,8 +5,11 @@ pipeline {
         stage('Parameters') {
             steps {
                 script {
-                    properties([parameters([choice(choices: ['TESTING', 'STAGING', 'PRODUCTION'], description: 'echo "Will deploy to ${params.DEPLOY_ENV}"', name: 'DEPLOY_ENV')])])
-                    echo "Output is ${params.DEPLOY_ENV}"
+                   // properties([parameters([choice(choices: ['TESTING', 'STAGING', 'PRODUCTION'], description: 'echo "Will deploy to ${params.DEPLOY_ENV}"', name: 'DEPLOY_ENV')])])
+                   // echo "Output is ${params.DEPLOY_ENV}"
+                   
+                    properties([parameters([string(defaultValue: 'Linux', description: 'To define Different Platform', name: 'Platform', trim: true)])])
+                    echo "output: ${params.Platform}"
                }
             }
         }

@@ -8,8 +8,12 @@ pipeline {
                    // properties([parameters([choice(choices: ['TESTING', 'STAGING', 'PRODUCTION'], description: 'echo "Will deploy to ${params.DEPLOY_ENV}"', name: 'DEPLOY_ENV')])])
                    // echo "Output is ${params.DEPLOY_ENV}"
                    
-                    properties([parameters([string(defaultValue: 'Linux', description: 'To define Different Platform', name: 'Platform', trim: true)])])
-                    echo "output: ${params.Platform}"
+                   //  properties([parameters([string(defaultValue: 'Linux', description: 'To define Different Platform', name: 'Platform', trim: true)])])
+                   //  echo "output: ${params.Platform}"
+                   
+                   properties([parameters([choice(choices: ['Windows', 'Linux', 'Mac'], description: 'To define Different Platform', name: 'Platform'), choice(choices: ['A', 'B', 'C', 'D'], description: 'Select Folder', name: 'Folder')])])
+                    echo "output1: ${params.Platform}"
+                    echo "output2: ${params.Folder}"
                }
             }
         }

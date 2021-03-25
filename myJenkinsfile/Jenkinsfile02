@@ -6,7 +6,8 @@ pipeline {
             steps {
                 script {
                     properties([parameters([choice(choices: ['TESTING', 'STAGING', 'PRODUCTION'], description: 'echo "Will deploy to ${params.DEPLOY_ENV}"', name: 'DEPLOY_ENV')])])
-                }
+                    echo "Output is ${params.DEPLOY_ENV}"
+               }
             }
         }
     }

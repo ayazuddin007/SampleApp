@@ -1,20 +1,22 @@
 // sending_params_to_another_job
-
+// Install Extended Choice Parameter Plugin --> For Selecting Mulitple Values At a time
+//case1: Passing single parameter
+Job1:
+------
 pipeline {
     agent any
     parameters { choice(name: 'ENV', choices: ['Dev', 'Qa', 'Prod'], description: '') }
     stages {
         stage("PARAM 1") {
             steps {
-                build job: 'job_2_pipeline', parameters: [string(name: 'ENV', value: "${params.ENV}")]
+                build job: 'Job2', parameters: [string(name: 'ENV', value: "${params.ENV}")]
             }
         }
     }
 }
 
-
-
-
+Job2:
+-----
 pipeline {
     agent any
     parameters {
@@ -25,6 +27,43 @@ pipeline {
             steps {
                 script{
                     echo "${params.ENV}"
+                }
+            }
+        }
+    }
+}
+
+
+//case1: Passing single parameter
+Job1:
+------
+properties([parameters([extendedChoice(description: '', multiSelectDelimiter: ',', name: 'Services', quoteValue: false, saveJSONParameterToFile: false, type: 'PT_CHECKBOX', value: 'MS1,MS2,MS3,MS4,MS5', visibleItemCount: 5), extendedChoice(description: '', multiSelectDelimiter: ',', name: 'Environment', quoteValue: false, saveJSONParameterToFile: false, type: 'PT_CHECKBOX', value: 'Dev,QA,Staging,Prod', visibleItemCount: 4)])])
+
+pipeline {
+    agent any
+    stages {
+        stage("PARAM 1") {
+            steps {
+                build job: 'Job2', parameters: [string(name: 'Output1', value: "${params.Services}"),string(name: 'Output2', value: "${params.Environment}")]
+            }
+        }
+    }
+}
+
+Job2
+-----
+pipeline {
+    agent any
+    parameters {
+        string(name: 'Output1', description: 'enter env value')
+        string(name: 'Output2', description: 'enter env value')
+    }
+    stages {
+        stage('Example') {
+            steps {
+                script{
+                    echo "${params.Output1}"
+                    echo "${params.Output2}"
                 }
             }
         }

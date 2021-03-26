@@ -23,22 +23,14 @@ Job2
 pipeline {
     agent any
     parameters {
-        string(defaultValue: '', description: 'enter env value', name: 'Output', trim: true)
+        string(defaultValue: '', description: '', name: 'Output', trim: true)
     }
     stages {
-        stage('Output') {
-            steps {
-                script{
-                    echo "${params.Output}"
-                   
-                }
-            }
-        }
-        stage('Output to var.yml file') {
+        stage('Save Output to var.yml file') {
             steps {
                 script {
                     def str2 = "${params.Output}".split(",");
-                    def data = "env:"
+                    def data = "\nenv:"
                     
                     if(str2.contains('')){
                         str2 = 'Dev'  //setting Output variable default value
@@ -52,17 +44,23 @@ pipeline {
                     data = data+'\n'
                     data = data+"\nkube_deployment_file: \"{{env.env_name}}.kube.deployment.yml\""
                     data = data+"\nkube_service_file: \"{{env.env_name}}.kube.service.yml\""
-                    data = data+'\n'
+                    data = data+'\n\n'
                     writeFile(file: 'vars.yml', text: data)
-                    sh "cat vars.yml"
+                   // sh "cat vars.yml"
               }
             }
         }
-        /*stage('Deploy to cluster'){
+        stage('Deploy to cluster'){
             steps
             {  
-                sshPublisher(publishers: [sshPublisherDesc(configName: 'Ansible-ubuntu', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: """ ansible-playbook --extra-vars ' Output1="${params.Output1}" Output2="${params.Output2}" ' /home/ubuntu/repo/test-playbook.yml """, execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: true)])
+                sshagent(['Ansible-Deployer']) {
+                    sh "scp -o StrictHostKeyChecking=no -r ${env.WORKSPACE}/vars.yml ubuntu@172.31.73.138:/home/ubuntu/repo"
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@172.31.73.138 cat /home/ubuntu/repo/vars.yml"
+                }
+                 
+                //sshPublisher(publishers: [sshPublisherDesc(configName: 'Ansible-ubuntu', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: """ ansible-playbook --extra-vars "@/home/ubuntu/repo/vars.yml" /home/ubuntu/repo/test-playbook.yml """, execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: true)])
+                
             }
-        }*/
+        }
     }
 }

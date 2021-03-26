@@ -2,7 +2,7 @@
 
 Job1
 ---------
-properties([parameters([extendedChoice(description: '', multiSelectDelimiter: ',', name: 'Services', quoteValue: false, saveJSONParameterToFile: false, type: 'PT_CHECKBOX', value: 'MS1,MS2,MS3,MS4,MS5', visibleItemCount: 5), extendedChoice(description: '', multiSelectDelimiter: ',', name: 'Environment', quoteValue: false, saveJSONParameterToFile: false, type: 'PT_CHECKBOX', value: 'Dev,QA,Staging,Prod', visibleItemCount: 4)])])
+properties([parameters([extendedChoice(defaultValue: '', description: '', multiSelectDelimiter: ',', name: 'Environment', quoteValue: false, saveJSONParameterToFile: false, type: 'PT_CHECKBOX', value: 'Dev,QA,Staging,Prod', visibleItemCount: 4)])])
 
 pipeline {
     agent any
@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Input') {
             steps {
-                build job: 'Job2', parameters: [string(name: 'Output1', value: "${params.Services}"),string(name: 'Output2', value: "${params.Environment}")]
+                build job: 'Job2', parameters: [string(name: 'Output', value: "${params.Environment}")]
             }
         }
     }
@@ -23,29 +23,32 @@ Job2
 pipeline {
     agent any
     parameters {
-        string(name: 'Output1', description: 'enter env value')
-        string(name: 'Output2', description: 'enter env value')
+        string(defaultValue: '', description: 'enter env value', name: 'Output', trim: true)
     }
     stages {
-        stage('OUTPUT') {
+        stage('Output') {
             steps {
                 script{
-                    echo "${params.Output1}"
-                    echo "${params.Output2}"
+                    echo "${params.Output}"
+                   
                 }
             }
         }
-        stage('OUTPUT to file') {
+        stage('Output to var.yml file') {
             steps {
                 script {
-                    def str2 = "${params.Output2}".split(",");
-                    if(str2.contains('')){
-                        str2 = 'a'  //setting Output2 default value
-                    }
+                    def str2 = "${params.Output}".split(",");
                     def data = "env:"
-                    for (i in str2) {
-                        data = data+ "\n - {env_name: \"$i\", enabled: true}"
+                    
+                    if(str2.contains('')){
+                        str2 = 'Dev'  //setting Output variable default value
+                        data = data+ "\n - {env_name: \"$str2\", enabled: true}"
+                    } else {
+                        for (i in str2) {
+                            data = data+ "\n - {env_name: \"$i\", enabled: true}"
+                        }  
                     }
+                    
                     data = data+'\n'
                     data = data+"\nkube_deployment_file: \"{{env.env_name}}.kube.deployment.yml\""
                     data = data+"\nkube_service_file: \"{{env.env_name}}.kube.service.yml\""

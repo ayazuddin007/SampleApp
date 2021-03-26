@@ -1,0 +1,65 @@
+//pass paramter from one job to other job and storing that parameter inside var.yml file
+
+Job1
+---------
+properties([parameters([extendedChoice(description: '', multiSelectDelimiter: ',', name: 'Services', quoteValue: false, saveJSONParameterToFile: false, type: 'PT_CHECKBOX', value: 'MS1,MS2,MS3,MS4,MS5', visibleItemCount: 5), extendedChoice(description: '', multiSelectDelimiter: ',', name: 'Environment', quoteValue: false, saveJSONParameterToFile: false, type: 'PT_CHECKBOX', value: 'Dev,QA,Staging,Prod', visibleItemCount: 4)])])
+
+pipeline {
+    agent any
+    options { skipDefaultCheckout() }
+    
+    stages {
+        stage('Input') {
+            steps {
+                build job: 'Job2', parameters: [string(name: 'Output1', value: "${params.Services}"),string(name: 'Output2', value: "${params.Environment}")]
+            }
+        }
+    }
+}
+
+
+Job2
+---------
+pipeline {
+    agent any
+    parameters {
+        string(name: 'Output1', description: 'enter env value')
+        string(name: 'Output2', description: 'enter env value')
+    }
+    stages {
+        stage('OUTPUT') {
+            steps {
+                script{
+                    echo "${params.Output1}"
+                    echo "${params.Output2}"
+                }
+            }
+        }
+        stage('OUTPUT to file') {
+            steps {
+                script {
+                    def str2 = "${params.Output2}".split(",");
+                    if(str2.contains('')){
+                        str2 = 'a'  //setting Output2 default value
+                    }
+                    def data = "env:"
+                    for (i in str2) {
+                        data = data+ "\n - {env_name: \"$i\", enabled: true}"
+                    }
+                    data = data+'\n'
+                    data = data+"\nkube_deployment_file: \"{{env.env_name}}.kube.deployment.yml\""
+                    data = data+"\nkube_service_file: \"{{env.env_name}}.kube.service.yml\""
+                    data = data+'\n'
+                    writeFile(file: 'vars.yml', text: data)
+                    sh "cat vars.yml"
+              }
+            }
+        }
+        /*stage('Deploy to cluster'){
+            steps
+            {  
+                sshPublisher(publishers: [sshPublisherDesc(configName: 'Ansible-ubuntu', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: """ ansible-playbook --extra-vars ' Output1="${params.Output1}" Output2="${params.Output2}" ' /home/ubuntu/repo/test-playbook.yml """, execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: true)])
+            }
+        }*/
+    }
+}

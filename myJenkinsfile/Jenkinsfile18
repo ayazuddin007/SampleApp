@@ -1,0 +1,116 @@
+Job1
+---------
+def GitHub_Url = 'https://github.com/AyazuddinEjazuddin/wex-spring-petclinic.git'
+def ECR_Docker_Repo = '894585519143.dkr.ecr.us-east-1.amazonaws.com'
+def Docker_Image = "wex-demo-app:petclinic${env.BUILD_ID}"
+def ECRURL = 'https://894585519143.dkr.ecr.us-east-1.amazonaws.com'
+def ECRCRED = 'ecr:us-east-1:aws-spring-boot-ecr'
+def CI = "${ECR_Docker_Repo}/${Docker_Image}"
+
+//setting parameter 
+properties([parameters([extendedChoice(description: '', multiSelectDelimiter: ',', name: 'Environment', quoteValue: false, saveJSONParameterToFile: false, type: 'PT_CHECKBOX', value: 'dev,test', visibleItemCount: 2)])])
+
+
+pipeline {
+    agent any
+    options { skipDefaultCheckout() }
+    environment {
+       PATH = "/usr/share/maven/bin/:$PATH"
+    }
+    
+    stages {
+        stage('Git Checkout') { 
+            steps {
+               git branch: 'main', credentialsId: 'Ayaz-xoriant-git', url: "${GitHub_Url}"
+            }
+        }
+        
+       stage('Maven Build') { 
+            steps {
+                sh "mvn clean install"
+            }
+        }
+        
+        stage ('Build Docker Image') {
+            steps {
+                sh "docker build -t ${CI} ."
+            }
+        }
+        
+       stage ('Push Image to ECR') {
+            steps {
+                script {
+                    docker.withRegistry("${ECRURL}", "${ECRCRED}") {
+                            sh "docker push ${CI}"
+                            
+                    }
+                    // make sure that the Docker image is removed
+                    sh "docker rmi -f ${CI} | true"
+                    
+                    //Passing Parameter to Job2
+                    build job: 'Job2', parameters: [string(name: 'Output1', value: "${params.Environment}"),string(name: 'Output2', value: "${CI}")]
+                }
+            }
+        }
+        
+        
+    }
+}
+
+
+Job2
+-------
+pipeline {
+    agent any
+    parameters {
+        string(name: 'Output1', description: 'enter env value')
+        string(name: 'Output2', description: 'enter env value')
+    }
+    stages {
+        stage('Save Output to var.yml file') {
+            steps {
+                script {
+                    ////echo "${params.Output1}"
+                    ///echo "${params.Output2}"
+                   // def str1 = "${params.Output2}".split("petclinic");
+                    //sh "echo $str1"
+                    
+                    
+                    def str2 = "${params.Output1}".split(",");
+                    def data = "\nenv:"
+                    
+                    if(str2.contains('')){
+                        str2 = 'dev,test'  //setting Output variable default value
+                        data = data+ "\n - {env_name: \"$str2\", enabled: true}"
+                    } else {
+                        for (i in str2) {
+                            data = data+ "\n - {env_name: \"$i\", enabled: true}"
+                        }  
+                    }
+                    
+                    data = data+'\n'
+                    data = data+"\nkube_deployment_file: \"{{env.env_name}}.kube.deployment.yml\""
+                    data = data+"\nkube_service_file: \"{{env.env_name}}.kube.service.yml\""
+                    data = data+"\n\ncontainer_image: \"${params.Output2}\""
+                    data = data+'\n\n'
+                    writeFile(file: 'vars.yml', text: data)
+                    //sh "cat vars.yml"
+              }
+            }
+        }
+        
+        stage('Deploy to cluster'){
+            steps
+            {   
+                sshagent(['Ansible-Deployer']) {
+                    sh "scp -o StrictHostKeyChecking=no -r ${env.WORKSPACE}/vars.yml ubuntu@172.31.73.138:/home/ubuntu/repo"
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@172.31.73.138 cat /home/ubuntu/repo/vars.yml"
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@172.31.73.138 ansible-playbook  /home/ubuntu/repo/setup-app.yml -vvv"
+                }
+                //sshPublisher(publishers: [sshPublisherDesc(configName: 'Ansible-ubuntu', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: """ ansible-playbook  /home/ubuntu/repo/setup-app.yml -vvv """, execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: true)])
+            }
+        }
+        
+        
+    }
+}

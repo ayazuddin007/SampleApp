@@ -1,0 +1,65 @@
+// code for getting to know from which git repo and branch has been triggred.
+
+def GitHub_Url = 'https://github.com/AyazuddinEjazuddin/wex-spring-petclinic.git'
+def ECR_Docker_Repo = '894585519143.dkr.ecr.us-east-1.amazonaws.com'
+def Docker_Image = "wex-demo-app:petclinic${env.BUILD_ID}"
+def ECRURL = 'https://894585519143.dkr.ecr.us-east-1.amazonaws.com'
+def ECRCRED = 'ecr:us-east-1:aws-spring-boot-ecr'
+def CI = "${ECR_Docker_Repo}/${Docker_Image}"
+
+//setting parameter 
+//properties([parameters([extendedChoice(description: '', multiSelectDelimiter: ',', name: 'Environment', quoteValue: false, saveJSONParameterToFile: false, type: 'PT_CHECKBOX', value: 'dev,test', visibleItemCount: 2)])])
+
+
+pipeline {
+    agent any
+    options { skipDefaultCheckout() }
+    environment {
+       PATH = "/usr/share/maven/bin/:$PATH"
+    }
+    
+    stages {
+        stage('Git Checkout') { 
+            steps {
+               git  branch: 'dev', credentialsId: 'Ayaz-xoriant-git', url: "${GitHub_Url}"
+            }
+        }
+        
+       stage('Maven Build') { 
+            steps {
+                //sh "mvn clean install"
+                script {
+                    def GIT_REPO_URL = sh(returnStdout: true, script: 'git config remote.origin.url').trim()
+                    sh "echo ${GIT_REPO_URL}"
+                    
+                    def GIT_REPO_BRANCH = sh(returnStdout: true, script: 'git rev-parse --abbrev-ref HEAD').trim()
+                    sh "echo ${GIT_REPO_BRANCH}"
+                }
+            }
+        }
+        
+        /*stage ('Build Docker Image') {
+            steps {
+                sh "docker build -t ${CI} ."
+            }
+        }*/
+        
+       /*stage ('Push Image to ECR') {
+            steps {
+                script {
+                    docker.withRegistry("${ECRURL}", "${ECRCRED}") {
+                            sh "docker push ${CI}"
+                            
+                    }
+                    // make sure that the Docker image is removed
+                    sh "docker rmi -f ${CI} | true"
+                    
+                    //Passing Parameter to Job2
+                    build job: 'Job2', parameters: [string(name: 'Output1', value: "${params.Environment}"),string(name: 'Output2', value: "${CI}")]
+                }
+            }
+        }*/
+        
+        
+    }
+}

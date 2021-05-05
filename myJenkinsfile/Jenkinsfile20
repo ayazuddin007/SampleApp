@@ -1,0 +1,23 @@
+//Jenkins for git lfs(Large file storage)
+
+pipeline {
+    agent any
+    options { skipDefaultCheckout() }
+    environment {
+       PATH = "/usr/share/maven/bin/:$PATH"
+    }
+    
+    stages {
+        stage('Git Checkout') { 
+            steps {
+                checkout([
+					$class: 'GitSCM', 
+					branches: [[name: '*']], 
+					extensions: [[$class: 'GitLFSPull']], 
+					userRemoteConfigs: [[credentialsId: 'Ayaz-xoriant-git', 
+					url: 'https://github.com/AyazuddinEjazuddin/large_files.git']]
+				])
+            }
+        }
+	}
+}

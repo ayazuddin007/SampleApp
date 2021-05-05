@@ -14,8 +14,7 @@ pipeline {
 					$class: 'GitSCM', 
 					branches: [[name: '*']], 
 					extensions: [[$class: 'GitLFSPull']], 
-					userRemoteConfigs: [[credentialsId: 'Ayaz-xoriant-git', 
-					url: 'https://github.com/AyazuddinEjazuddin/large_files.git']]
+					userRemoteConfigs: [[credentialsId: 'Ayaz-xoriant-git', url: 'https://github.com/AyazuddinEjazuddin/large_files.git']]
 				])
             }
         }

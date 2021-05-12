@@ -1,0 +1,30 @@
+// for loop to download articats from jfrog in our jenkins job artifacts folder
+
+def artifacts = ['IFCSAPI.war', 'IFCSServer.ear', 'IFCSServiceDelegates.war', 'IFCSSwingClient.war']
+
+pipeline {
+    agent any
+    options { skipDefaultCheckout() }
+    environment {
+       PATH = "/usr/share/maven/bin/:$PATH"
+    }
+    
+    stages {
+        
+        
+        stage('Stage1') { 
+            steps {
+                sh "mkdir artifacts"
+                script {
+                    for (int i = 0; i < artifacts.size(); i++) {
+                        // sh "echo Hello ${artifacts[i]}"
+                        sh "curl -u xoriant-jenkins:3I2VywilRU3t36VWMplJTHnglemP1FgN3xJ https://eu-central-1.artifactory.wexapps.com/artifactory/xoriant-maven/19/${artifacts[i]} -o artifacts/${artifacts[i]}"
+                    }
+                }
+                
+            }
+        }
+            
+       
+    }
+}

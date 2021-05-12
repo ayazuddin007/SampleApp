@@ -1,7 +1,22 @@
-// for loop to download articats from jfrog in our jenkins job artifacts folder
+// for loop to download articats from jfrog in our jenkins job artifacts and jf-artifacts directory
+// First create artifacts and jf-artifacts directory
+// In Jenkins Job 
+// mkdir artifactory jf-artifactory
+
+//To list the directory in Jenkins Job
+// ll /var/lib/jenkins/workspace/Mytest/
+
+//To list the artifacors in artifacts and jf-artifacts directory
+// ll /var/lib/jenkins/workspace/Mytest/artifacts/
+// ll /var/lib/jenkins/workspace/Mytest/jf-artifacts/
+
+// To Remove the artifact from artifacts and jf-artifacts directory
+// sudo rm -rf /var/lib/jenkins/workspace/Mytest/artifacts/*.*ar  /var/lib/jenkins/workspace/Mytest/jf-artifacts/*.*ar
+
 
 def artifacts = ['IFCSAPI.war', 'IFCSServer.ear', 'IFCSServiceDelegates.war', 'IFCSSwingClient.war']
-def Jfrog_Repo_url = "https://eu-central-1.artifactory.wexapps.com/artifactory/xoriant-maven/19"
+def Jfrog_Repo_Url = "https://eu-central-1.artifactory.wexapps.com/artifactory/xoriant-maven/${env.BUILD_NUMBER}"
+def Jfrog_Server_Url = "https://eu-central-1.artifactory.wexapps.com/artifactory"
 
 pipeline {
     agent any
@@ -14,17 +29,25 @@ pipeline {
     stages {
         
         
-        stage('Stage1') { 
+        stage('Download Artifacts Using Curl in artifacts Directory') { 
             steps {
                // sh "mkdir artifacts"
                 script {
                     for (int i = 0; i < artifacts.size(); i++) {
-                        // sh "echo Hello ${artifacts[i]}"
-                        sh "curl -u $JFROG_CREDS_USR:$JFROG_CREDS_PSW ${Jfrog_Repo_url}/${artifacts[i]} -o artifacts/${artifacts[i]}"
-                        
+                        // sh "echo ${artifacts[i]}"
+                        sh "curl -u $JFROG_CREDS_USR:$JFROG_CREDS_PSW ${Jfrog_Repo_Url}/${artifacts[i]} -o artifacts/${artifacts[i]}"
                     }
                 }
                 
+            }
+        }
+        
+        stage('Download Artifacts Using JFrog CLI in jf-artifacts Directory') { 
+            steps {
+               // sh "mkdir jf-artifacts"
+                script {
+                    sh "jfrog rt dl xoriant-maven/${env.BUILD_NUMBER}/  jf-artifacts/ --flat=true --url=${Jfrog_Server_Url} --user=$JFROG_CREDS_USR --password=$JFROG_CREDS_PSW "
+                }
             }
         }
             

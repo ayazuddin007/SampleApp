@@ -1,0 +1,109 @@
+def github_Url = 'https://github.com/ayazuddin007/python-docker-example.git'    //maven-docker-example, nodejs-docker-example, python-docker-example
+def artifactId = 'python-docker-example'
+def github_Branch = 'master'
+def credentialsId = 'ayaz-github-cred'
+def registry_Url = "https://xorayaz.jfrog.io/artifactory"
+def registry_id = "xorayaz.jfrog.io"
+def maven_registry = "xoriant-maven"
+def docker_registry = "xoriant-docker"
+def version = "${env.BUILD_NUMBER}"
+def mvnJFrogPath = "$maven_registry/$artifactId/$version/"
+def dockerImage = "$registry_id/$docker_registry/$artifactId:$version"
+
+pipeline {
+    agent any
+    options { skipDefaultCheckout() }
+    environment {
+        PATH = "/opt/maven/bin/:$PATH"
+        JFROG_ARTIFACT_CREDS = credentials('jfrog-deployer')
+    }
+    stages {
+        stage('Git Checkout') {
+            steps {
+                script {
+                    git branch: "${github_Branch}", credentialsId: "${credentialsId}", url: "${github_Url}"
+                }
+                  
+            }
+        }
+        stage('Build') {
+            steps {
+                script {
+                    
+                    // check app
+                    if (fileExists('pom.xml')) { // code for java App
+                    
+                        echo "This is Java App"
+                        mavenBuildAndUploadArtifactToJFrog("$mvnJFrogPath", "$registry_Url")
+                        buildAndUploadDockerImagetoJFrog("$dockerImage", "$registry_id")
+                        removeDockerImage("$dockerImage")
+                        uploadKubernetsZiptoJFrog("$artifactId", "$version", "$mvnJFrogPath", "$registry_Url") 
+                        
+                    } else { // code for nodejs, python App
+                    
+                        if (fileExists('package.json')) {
+                            echo "This is NodeJS App"
+                        } else if (fileExists('main.py')) {
+                            echo "This is Python App"
+                        }
+                        buildAndUploadDockerImagetoJFrog("$dockerImage", "$registry_id")
+                        removeDockerImage("$dockerImage")
+                        uploadKubernetsZiptoJFrog("$artifactId", "$version", "$mvnJFrogPath", "$registry_Url") 
+                    }
+     
+                }
+            }
+        }
+        stage("Test") {
+            steps {
+                script {
+                    echo "Test"
+                }   
+            }
+        }
+    
+        
+        stage('Deploy') {
+            steps {
+                script {
+                    echo "Deploy"
+                } 
+            }
+        }
+        
+        
+        
+    }
+}
+
+
+def mavenBuildAndUploadArtifactToJFrog(String mvnJFrogPath, String registry_Url) {
+    // maven build
+    sh "mvn clean install -DskipTests"
+
+    // upload artifact to jfrog
+    sh "jf rt u '**/*.*ar' $mvnJFrogPath  --flat=true --url $registry_Url --user $JFROG_ARTIFACT_CREDS_USR --password $JFROG_ARTIFACT_CREDS_PSW"
+}
+
+def buildAndUploadDockerImagetoJFrog(String dockerImage, String registry_id) {
+    // build and push docker image to jfrog
+    sh "docker build -t $dockerImage ."
+    sh "docker login -u $JFROG_ARTIFACT_CREDS_USR -p $JFROG_ARTIFACT_CREDS_PSW $registry_id"
+    sh "docker push $dockerImage"
+}
+
+def removeDockerImage(String dockerImage) {
+    // remove docker image locally
+    sh "docker rmi -f $dockerImage"
+}
+
+def uploadKubernetsZiptoJFrog(String artifactId, String version, String mvnJFrogPath, String registry_Url) {
+    // upload zip to jfrog
+    zip_src = 'kubernetes'	
+    zip_name = "${artifactId}-${version}-kubernetes-manifests"
+    zip_upload_path = "${mvnJFrogPath}"
+    sh "cp -rf ${zip_src} ${artifactId}"
+    sh "zip -r ${zip_name}.zip ${artifactId}"
+    sh "jfrog rt u ${zip_name}.zip ${zip_upload_path} --url $registry_Url --user $JFROG_ARTIFACT_CREDS_USR --password $JFROG_ARTIFACT_CREDS_PSW"
+    sh "rm -rf ${zip_name}.zip ${artifactId}"
+}

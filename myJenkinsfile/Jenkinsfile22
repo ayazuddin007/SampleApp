@@ -1,4 +1,4 @@
-# Pipeline for multiple appication(i.e. java, nodejs, python)
+// Pipeline for multiple appication(i.e. java, nodejs, python)
 
 def github_Url = 'https://github.com/ayazuddin007/python-docker-example.git'    //maven-docker-example, nodejs-docker-example, python-docker-example
 def artifactId = 'python-docker-example'

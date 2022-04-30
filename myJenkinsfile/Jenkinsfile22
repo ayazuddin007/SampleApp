@@ -1,7 +1,7 @@
-// Pipeline for multiple appication(i.e. java, nodejs, python)
+// Pipeline for multiple appication (i.e. java, nodejs, python)
 
-def github_Url = 'https://github.com/ayazuddin007/python-docker-example.git'    //maven-docker-example, nodejs-docker-example, python-docker-example
-def artifactId = 'python-docker-example'
+def artifactId = 'nodejs-docker-example' //maven-docker-example, nodejs-docker-example, python-docker-example
+def github_Url = "https://github.com/ayazuddin007/${artifactId}.git"
 def github_Branch = 'master'
 def credentialsId = 'ayaz-github-cred'
 def registry_id = "xorayaz.jfrog.io"

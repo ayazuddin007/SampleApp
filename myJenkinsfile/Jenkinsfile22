@@ -8,9 +8,10 @@ def registry_id = "xorayaz.jfrog.io"
 def registry_Url = "https://$registry_id/artifactory"
 def maven_registry = "xoriant-maven"
 def docker_registry = "xoriant-docker"
+def group_id = "xor"
 def version = "${env.BUILD_NUMBER}"
-def mvnJFrogPath = "$maven_registry/$artifactId/$version/"
-def dockerImage = "$registry_id/$docker_registry/$artifactId:$version"
+def mvnJFrogPath = "$maven_registry/$group_id/$artifactId/$version/"
+def dockerImage = "$registry_id/$group_id/$docker_registry/$artifactId:$version"
 
 pipeline {
     agent any
